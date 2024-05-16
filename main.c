@@ -35,7 +35,7 @@ void handle_client(int newsockfd) {
 		"  target <target name>  - Set target name for OpenOCD\n"
 		"  exit                  - Disconnect from the server\n";
 
-	n = write(newsockfd, "Connected to systemd reset tool. Type 'help' for a list of commands.\n", 67);
+	n = write(newsockfd, "Connected to systemd reset tool. Type 'help' for a list of commands.\n", 69);
 
 	if (n < 0) {
 		error("ERROR writing to socket");
