@@ -3,3 +3,4 @@ cli: main.c
 
 install: cli
 	install -m 644 cli /usr/local/bin
+	chmod +x /usr/local/bin/cli
