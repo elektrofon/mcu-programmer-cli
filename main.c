@@ -13,9 +13,20 @@ int restart_openocd() {
 	return system("systemctl restart openocd");
 }
 
+int restart_serial() {
+	return system("systemctl restart debug");
+}
+
 int set_target(const char *target_name) {
 	char command[256];
-	snprintf(command, sizeof(command), "echo TARGET=%s > /opt/mcuprogrammer/config.env", target_name);
+	snprintf(command, sizeof(command), "sed -i 's/TARGET=.*/TARGET=%s/' /opt/mcuprogrammer/config.env", target_name);
+
+	return system(command);
+}
+
+int set_baudrate(const char *baudrate) {
+	char command[256];
+	snprintf(command, sizeof(command), "sed -i 's/BAUDRATE=.*/BAUDRATE=%s/' /opt/mcuprogrammer/config.env", baudrate);
 
 	return system(command);
 }
@@ -33,6 +44,7 @@ void handle_client(int newsockfd) {
 		"Available commands:\n"
 		"  help                  - Show this help message\n"
 		"  target <target name>  - Set target name for OpenOCD\n"
+		"  baudrate <baudrate>   - Set baudrate for serial port\n"
 		"  exit                  - Disconnect from the server\n";
 
 	n = write(newsockfd, "Connected to MCU Programmer CLI. Type 'help' for a list of commands.\n", 69);
@@ -69,6 +81,21 @@ void handle_client(int newsockfd) {
 
 			if (ret != 0) {
 				n = write(newsockfd, "Failed to restart OpenOCD.\n", 28);
+			}
+		} else if (strncmp(buffer, "baudrate ", 9) == 0) {
+			char *baudrate = buffer + 9;
+			int ret = 0;
+
+			ret = set_baudrate(baudrate);
+
+			if (ret != 0) {
+				n = write(newsockfd, "Failed to set baudrate.\n", 24);
+			}
+
+			ret = restart_serial();
+
+			if (ret != 0) {
+				n = write(newsockfd, "Failed to restart serial.\n", 26);
 			}
 		} else if (strcmp(buffer, "exit") == 0) {
 			n = write(newsockfd, "Goodbye!\n", 9);

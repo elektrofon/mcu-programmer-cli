@@ -51,6 +51,8 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+.ccls-cache
+
 # MacOS
 # General
 .DS_Store
